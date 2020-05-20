@@ -6,4 +6,5 @@ import pl.plenczewski.sza3home.models.AppUserRole;
 
 @Repository
 public interface AppUserRoleRepo extends JpaRepository<AppUserRole, Long> {
+    AppUserRole getFirstByRole(String role);
 }

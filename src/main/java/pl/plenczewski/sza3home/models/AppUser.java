@@ -20,10 +20,11 @@ public class AppUser implements UserDetails {
     private String username;
     private String password;
     private boolean isEnabled;
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<AppUserRole> authorities;
 
     public AppUser() {
+        authorities = new ArrayList<>();
     }
 
     public void setAuthorities(List<AppUserRole> authorities) {

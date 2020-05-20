@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.plenczewski.sza3home.models.AppUser;
 import pl.plenczewski.sza3home.repository.AppUserRepo;
+import pl.plenczewski.sza3home.services.UserRoleService;
 import pl.plenczewski.sza3home.services.UserService;
 
 import javax.mail.MessagingException;
@@ -18,15 +19,17 @@ public class RegisterController {
 
 
     private UserService userService;
+    private UserRoleService userRoleService;
 
-    @Autowired
-    public RegisterController(UserService userService) {
+    public RegisterController(UserService userService, UserRoleService userRoleService) {
         this.userService = userService;
+        this.userRoleService = userRoleService;
     }
 
     @GetMapping("/singup")
     public String registerForm(Model model){
         model.addAttribute("registerUser", new AppUser());
+        model.addAttribute("allRoles", userRoleService.getAllRolesInSystem());
         return "registration";
     }
 
