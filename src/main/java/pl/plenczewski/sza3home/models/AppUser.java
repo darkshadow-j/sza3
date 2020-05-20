@@ -4,12 +4,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class AppUser implements UserDetails {
@@ -21,8 +20,14 @@ public class AppUser implements UserDetails {
     private String username;
     private String password;
     private boolean isEnabled;
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<AppUserRole> authorities;
 
     public AppUser() {
+    }
+
+    public void setAuthorities(List<AppUserRole> authorities) {
+        this.authorities = authorities;
     }
 
     @Override
@@ -68,7 +73,7 @@ public class AppUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        return authorities;
     }
 
     public String getPassword() {
