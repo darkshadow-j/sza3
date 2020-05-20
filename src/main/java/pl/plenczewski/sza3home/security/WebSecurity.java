@@ -32,6 +32,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user").hasRole("USER")
                 .antMatchers("/singup").permitAll()
                 .antMatchers("/mail").permitAll()
-                .and().formLogin().loginPage("/login").permitAll();
+                .and().formLogin().loginPage("/login").permitAll()
+                .and().rememberMe();
     }
 }
