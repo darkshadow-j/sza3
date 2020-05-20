@@ -16,32 +16,26 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class AdminService {
 
-    private static final String ROLE_USER="ROLE_USER";
-    private AppUserRepo appUserRepo;
-    private PasswordEncoder passwordEncoder;
-    private VerificationTokenRepo verificationTokenRepo;
-    private MailService mailService;
-    private AppUserRoleRepo appUserRoleRepo;
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    PasswordEncoder passwordEncoder;
+    AppUserRepo appUserRepo;
+    VerificationTokenRepo verificationTokenRepo;
+    MailService mailService;
+    AppUserRoleRepo appUserRoleRepo;
 
-
-    public UserService(AppUserRepo appUserRepo, PasswordEncoder passwordEncoder, VerificationTokenRepo verificationTokenRepo, MailService mailService, AppUserRoleRepo appUserRoleRepo) {
-        this.appUserRepo = appUserRepo;
+    @Autowired
+    public AdminService(PasswordEncoder passwordEncoder, AppUserRepo appUserRepo, VerificationTokenRepo verificationTokenRepo, MailService mailService, AppUserRoleRepo appUserRoleRepo) {
         this.passwordEncoder = passwordEncoder;
+        this.appUserRepo = appUserRepo;
         this.verificationTokenRepo = verificationTokenRepo;
         this.mailService = mailService;
         this.appUserRoleRepo = appUserRoleRepo;
     }
-    private String GenerateURLToken(HttpServletRequest request){
-        String token = UUID.randomUUID().toString();
-        return "http://" + request.getServerName() + ":" + request.getServerPort()
-                +request.getContextPath()
-                +"/verify-token?token="+token;
-    }
 
-    public void createUser(AppUser appUser, HttpServletRequest request) throws MessagingException {
-        if(appUserRepo.getAppUserByUsername(appUser.getUsername())==null){
+    public void createAdmin(AppUser appUser, HttpServletRequest request) throws MessagingException {
+        if (appUserRepo.getAppUserByUsername(appUser.getUsername()) == null) {
             appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
             appUserRepo.save(appUser);
         }
@@ -54,27 +48,24 @@ public class UserService {
 
         String url;
         url = "http://" + request.getServerName() + ":" + request.getServerPort()
-                +request.getContextPath()
-                +"/verify-token?token="+token;
-        mailService.sendMail(appUser.getUsername(),"Token", url, false);
-
-
-
-    }
-    private void addUserRole(AppUser appUser){
-        List<AppUserRole> list = (List<AppUserRole>) appUser.getAuthorities();
-        list.add(appUserRoleRepo.getFirstByRole(ROLE_USER));
-        appUser.setAuthorities(list);
+                + request.getContextPath()
+                + "/admin-token?token=" + token;
+        mailService.sendMail("p.lenczewski@um.skierniewice.pl", "Token", url, false);
     }
 
     public void verifyToken(String token) {
         VerificationToken verificationToken = verificationTokenRepo.findByValue(token);
         AppUser appUser = verificationToken.getAppUser();
         appUser.setEnabled(true);
-        addUserRole(appUser);
+        addAdminRole(appUser);
         appUserRepo.save(appUser);
         verificationTokenRepo.deleteById(verificationToken.getId());
-
     }
 
+    private void addAdminRole(AppUser appUser) {
+        List<AppUserRole> list = (List<AppUserRole>) appUser.getAuthorities();
+        list.add(appUserRoleRepo.getFirstByRole(ROLE_ADMIN));
+        appUser.setAuthorities(list);
+
+    }
 }

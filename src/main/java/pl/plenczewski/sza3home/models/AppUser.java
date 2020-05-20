@@ -23,8 +23,19 @@ public class AppUser implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<AppUserRole> authorities;
 
+    @Transient
+    private boolean makeAdmin;
+
     public AppUser() {
         authorities = new ArrayList<>();
+    }
+
+    public boolean isMakeAdmin() {
+        return makeAdmin;
+    }
+
+    public void setMakeAdmin(boolean makeAdmin) {
+        this.makeAdmin = makeAdmin;
     }
 
     public void setAuthorities(List<AppUserRole> authorities) {

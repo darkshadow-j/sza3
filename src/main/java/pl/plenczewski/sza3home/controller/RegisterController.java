@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.plenczewski.sza3home.models.AppUser;
 import pl.plenczewski.sza3home.repository.AppUserRepo;
+import pl.plenczewski.sza3home.services.AdminService;
+import pl.plenczewski.sza3home.services.CreateAccountService;
 import pl.plenczewski.sza3home.services.UserRoleService;
 import pl.plenczewski.sza3home.services.UserService;
 
@@ -20,10 +22,15 @@ public class RegisterController {
 
     private UserService userService;
     private UserRoleService userRoleService;
+    private AdminService adminService;
+    private CreateAccountService createAccountService;
 
-    public RegisterController(UserService userService, UserRoleService userRoleService) {
+    @Autowired
+    public RegisterController(UserService userService, UserRoleService userRoleService, AdminService adminService, CreateAccountService createAccountService) {
         this.userService = userService;
         this.userRoleService = userRoleService;
+        this.adminService = adminService;
+        this.createAccountService = createAccountService;
     }
 
     @GetMapping("/singup")
@@ -35,13 +42,19 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String createUser(@ModelAttribute AppUser appUser, HttpServletRequest request) throws MessagingException {
-        userService.createUser(appUser, request);
+        createAccountService.createNewAccount(appUser, request);
         return "registration";
     }
 
     @RequestMapping("verify-token")
     public String veryfiToken(@RequestParam String token){
         userService.verifyToken(token);
+        return "login";
+    }
+
+    @RequestMapping("admin-token")
+    public String veryfiAdminToken(@RequestParam String token){
+        adminService.verifyToken(token);
         return "login";
     }
 }
